@@ -1,34 +1,32 @@
-export interface IBasket {
-    items: Map<string, number>;
-    add(id: string): void;
-    remove(id: string): void;
-    totalPrice(prices: number[]): number;
+export interface IProduct {
+    id: string,
+    description: string,
+    image: string,
+    title: string,
+    category: string,
+    price: number
 }
 
-export interface ICardsList {
-    drawCards(cards: ICardItem[]): void;
+export interface IOrder {
+    productsID: string[],
+
 }
 
-export type TCategory = 'софт-скил' | 'другое' | 'дополнительное' | 'кнопка' | 'хард-скил';
+/*interface IBasket {
+    products: IProduct[],
 
-export interface ICardItem {
-    id: string;
-    description: string;
-    image: string;
-    title: string;
-    category: TCategory;
-    price: number | null
+}*/
+
+export interface IGetProductsResponse {
+    total: number;
+    items: IProduct[];
 }
 
-export interface IUser {
-    paymentOnline: boolean;
-    email: string;
-    phone: string;
-    address: string;
+//_soft, _hard, _other, _additional, _button
+export const categoryMap: Record<string, string> = {
+    'софт-скил': 'soft',
+    'хард-скил': 'hard',
+    'кнопка': 'button',
+    'дополнительное': 'additional',
+    'другое': 'other',
 }
-
-export type TOrder = Pick<IUser, 'paymentOnline' | 'address'>
-
-export type TUserContacts = Pick<IUser, 'email' | 'phone'>
-
-export type TSuccessfulPayment = Pick<IBasket, 'totalPrice'>
