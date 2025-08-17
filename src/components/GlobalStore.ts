@@ -21,7 +21,32 @@ export class GlobalStore {
         return this.basketProducts
     }
 
-    setBasketProducts(product: IProduct) {
+    setAddBasketProducts(product: IProduct) {
         this.basketProducts.push(product)
     }
+
+    setDeleteBasketProducts(product: IProduct) {
+        this.basketProducts = this.basketProducts.filter(item => {
+            return item !== product
+        })
+    }
+
+    isProductInBasket(product: IProduct) {
+        return this.basketProducts.includes(product);
+    }
+
+    orderAmount() {
+        let amount = 0
+        this.basketProducts.forEach(item => {
+            if (item.price) {
+                amount += item.price
+            }
+        })
+        return amount
+    }
+
+    orderCounte() {
+        return this.basketProducts.length
+    }
+   
 }

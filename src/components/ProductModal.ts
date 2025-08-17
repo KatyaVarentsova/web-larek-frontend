@@ -6,6 +6,7 @@ import { IEvents } from "./base/events";
 export class ProductModal {
     element: HTMLElement;
     events: IEvents;
+    private _productButtonHandler?: (event: MouseEvent) => void;
 
     constructor(clonnedCardTemplate: HTMLElement, events: IEvents) {
         this.element = this.createElement(clonnedCardTemplate)
@@ -30,14 +31,14 @@ export class ProductModal {
         })
     }
 
-    open(product: IProduct) {
+    open(product: IProduct, isProductInBasket: boolean) {
         const productImage = ensureElement<HTMLImageElement>('.card__image', this.element)
         const productCategory = ensureElement<HTMLSpanElement>('.card__category', this.element)
         const productTitle = ensureElement<HTMLHeadingElement>('.card__title', this.element)
         const productText = ensureElement<HTMLParagraphElement>('.card__text', this.element)
         const productPrice = ensureElement<HTMLSpanElement>('.card__price', this.element)
         const productButton = ensureElement<HTMLButtonElement>('.button', this.element)
-        
+
         productImage.src = CDN_URL + product.image
         productCategory.textContent = product.category
         const categoryClass = categoryMap[product.category.toLocaleLowerCase()]
@@ -47,20 +48,47 @@ export class ProductModal {
         productTitle.textContent = product.title
         productText.textContent = product.description
         productPrice.textContent = product.price ? `${product.price} синапсов` : `Бесценно`
-        this.addProductInBasket(productButton, product)
 
+        if (isProductInBasket) {
+            productButton.textContent = 'Убрать'
+            this.setDeleteHandler(productButton, product)
+        } else {
+            productButton.textContent = 'В корзину'
+            this.setAddHandler(productButton, product)
+        }
+
+        document.body.style.overflow = 'hidden';
         this.element.classList.add('modal_active')
     }
 
     close() {
+        document.body.style.overflow = '';
         this.element.classList.remove('modal_active')
     }
 
-    addProductInBasket(productButton: HTMLButtonElement, product: IProduct) {
-        productButton.addEventListener('click', () => {
-            this.events.emit('product:put', product)
-        })
+    private removeHandler(btn: HTMLButtonElement) {
+        if (this._productButtonHandler) {
+            btn.removeEventListener('click', this._productButtonHandler);
+        }
     }
 
+    private setAddHandler(btn: HTMLButtonElement, product: IProduct) {
+        this.removeHandler(btn)
+        this._productButtonHandler = () => {
+            this.events.emit('product:put', product)
+            this.setDeleteHandler(btn, product);
+            btn.textContent = 'Убрать';
+        }
+        btn.addEventListener('click', this._productButtonHandler)
+    }
 
+    private setDeleteHandler(btn: HTMLButtonElement, product: IProduct) {
+        this.removeHandler(btn)
+        this._productButtonHandler = () => {
+            this.events.emit('product:delete', product)
+            this.setAddHandler(btn, product); 
+            btn.textContent = 'В корзину';
+        }
+        btn.addEventListener('click', this._productButtonHandler)
+    }
 }

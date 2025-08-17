@@ -9,10 +9,9 @@ export class ViewManager {
     galleryNode: HTMLElement;
     events: IEvents;
 
-    constructor(headerSelector: string , gallerySelector: string, events: IEvents) { 
+    constructor(headerSelector: string, gallerySelector: string, events: IEvents) {
         this.headerNode = ensureElement(headerSelector)
         this.galleryNode = ensureElement(gallerySelector)
-
         this.events = events;
 
         this.addEventBasket()
@@ -24,8 +23,14 @@ export class ViewManager {
 
     addEventBasket() {
         const basket = ensureElement('.header__basket', this.headerNode)
+
         basket.addEventListener('click', () => {
             this.events.emit('basket:add')
         })
+    }
+
+    displayBasketCounter(orderCounte: number) {
+        const basketCounter = ensureElement('.header__basket-counter', this.headerNode)
+        basketCounter.textContent = String(orderCounte)
     }
 }

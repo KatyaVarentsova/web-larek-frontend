@@ -12,11 +12,10 @@ export class BasketModal {
     }
 
     createElement(clonnedElement: HTMLElement) {
-        console.log(clonnedElement)
         return clonnedElement
     }
 
-     addEventListeners() {
+    addEventListeners() {
         const buttonClose = ensureElement<HTMLButtonElement>('.modal__close', this.element)
         buttonClose.addEventListener('click', () => {
             this.events.emit('basket:close')
@@ -26,18 +25,33 @@ export class BasketModal {
                 this.events.emit('basket:close')
             }
         })
+
+        const basketButton = ensureElement<HTMLButtonElement>('.button', this.element)
+        basketButton.addEventListener('click', () => {
+            this.events.emit('delivery:open')
+        })
     }
 
+    addRemoveListeners(btn: HTMLButtonElement, product: IProduct) {
+        btn.addEventListener('click', () => {
+            this.events.emit('product:delete', product)
+        })
+    }
 
-    open(products: IProduct[]) {
+    open(products: IProduct[], orderAmount: number) {
         const basketElement = ensureElement<HTMLDivElement>('.basket', this.element)
         const listElement = ensureElement<HTMLUListElement>('.basket__list', basketElement)
         const actionsElement = ensureElement<HTMLDivElement>('.modal__actions', basketElement)
         
+        const priceElement = ensureElement<HTMLSpanElement>('.basket__price')
+
         listElement.innerHTML = ''
 
         if (products.length !== 0) {
             products.forEach((product, index) => {
+                const deleteButton = createElement<HTMLButtonElement>('button',
+                    { className: 'basket__item-delete', ariaLabel: 'удалить' })
+
                 const basketItem = createElement<HTMLLIElement>('li',
                     { className: 'basket__item card card_compact' },
                     [
@@ -46,14 +60,16 @@ export class BasketModal {
                         createElement<HTMLSpanElement>('span',
                             { className: 'card__title', textContent: product.title }),
                         createElement<HTMLSpanElement>('span',
-                            { className: 'card__price', textContent: `${product.price} синапсов` }),
-                        createElement<HTMLButtonElement>('button',
-                            { className: 'basket__item-delete', ariaLabel: 'удалить'})
+                            { className: 'card__price', textContent: product.price ? `${product.price} синапсов` : `Бесценно` }),
+                        deleteButton
                     ]
                 )
+                this.addRemoveListeners(deleteButton, product)
                 listElement.append(basketItem)
             })
+            
             actionsElement.style.display = 'flex'
+            priceElement.textContent = `${orderAmount} синапсов`
 
         } else {
             actionsElement.style.display = 'none'
@@ -68,6 +84,8 @@ export class BasketModal {
     close() {
         this.element.classList.remove('modal_active')
     }
+
+
 
 
 }
