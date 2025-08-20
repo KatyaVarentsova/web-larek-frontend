@@ -33,5 +33,14 @@
     &::placeholder {
       color: lighten($primaryLight, 23%);
     }
+
+    &__invalid {
+      border-color: $error;
+      outline-color: $error;
+    }
+  }
+
+  &__errors {
+    display: none;
   }
 }

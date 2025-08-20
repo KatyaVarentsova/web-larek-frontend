@@ -1,12 +1,13 @@
 /* Класс, описывающий состояние приложения*/
 
-import { IProduct } from "../types";
+import { IContact, IDelivery, IOrder, IProduct } from "../types";
 
 export class GlobalStore {
     private products: IProduct[];
     private basketProducts: IProduct[];
-    //заказ
-    //состояние модалок
+    private delivery: IDelivery;
+    private contact: IContact;
+    private order: IOrder;
 
     constructor() {
         this.products = [];
@@ -21,14 +22,18 @@ export class GlobalStore {
         return this.basketProducts
     }
 
-    setAddBasketProducts(product: IProduct) {
+    addBasketProducts(product: IProduct) { 
         this.basketProducts.push(product)
     }
 
-    setDeleteBasketProducts(product: IProduct) {
+    deleteBasketProducts(product: IProduct) { 
         this.basketProducts = this.basketProducts.filter(item => {
             return item !== product
         })
+    }
+
+    cleaningBasketProducts() {
+        this.basketProducts.length = 0;
     }
 
     isProductInBasket(product: IProduct) {
@@ -45,8 +50,43 @@ export class GlobalStore {
         return amount
     }
 
-    orderCounte() {
+    orderCount() {
         return this.basketProducts.length
+    }
+
+    allProductsID() {
+        const arrID: string[] = []
+        this.basketProducts.forEach((item) => {
+            arrID.push(item.id)
+        })
+        return arrID
+    }
+
+    setDelivery(delivery: IDelivery) {
+        this.delivery = delivery;
+    }
+
+    getDelivery() {
+        return this.delivery
+    }
+
+    setContact(contact: IContact) {
+        this.contact = contact
+    }
+
+    getContact() {
+        return this.contact
+    }
+
+    getOrder() {
+        return this.order = {
+            payment: this.delivery.payment,
+            email: this.contact.email,
+            phone: this.contact.phone,
+            address: this.delivery.address,
+            total: this.orderAmount(),
+            items: this.allProductsID()
+        }
     }
    
 }

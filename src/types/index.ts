@@ -7,16 +7,6 @@ export interface IProduct {
     price: number
 }
 
-export interface IOrder {
-    productsID: string[],
-
-}
-
-/*interface IBasket {
-    products: IProduct[],
-
-}*/
-
 export interface IGetProductsResponse {
     total: number;
     items: IProduct[];
@@ -30,3 +20,19 @@ export const categoryMap: Record<string, string> = {
     'дополнительное': 'additional',
     'другое': 'other',
 }
+
+export interface IDelivery {
+    payment: string,
+    address: string,
+}
+
+export interface IContact {
+    email: string,
+    phone: string,
+}
+
+export interface IOrder extends IDelivery, IContact {
+    total: number,
+    items: string[]
+}
+

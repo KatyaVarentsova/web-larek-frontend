@@ -47,14 +47,21 @@ export class ProductModal {
         }
         productTitle.textContent = product.title
         productText.textContent = product.description
-        productPrice.textContent = product.price ? `${product.price} синапсов` : `Бесценно`
+        if (product.price) {
+            productPrice.textContent = `${product.price} синапсов`
+            productButton.disabled = false
+            if (isProductInBasket) {
+                productButton.textContent = 'Убрать'
+                this.setDeleteHandler(productButton, product)
+            } else {
+                productButton.textContent = 'В корзину'
+                this.setAddHandler(productButton, product)
+            }
 
-        if (isProductInBasket) {
-            productButton.textContent = 'Убрать'
-            this.setDeleteHandler(productButton, product)
         } else {
-            productButton.textContent = 'В корзину'
-            this.setAddHandler(productButton, product)
+            productPrice.textContent = `Бесценно`
+            productButton.textContent = 'Не продаётся'
+            productButton.disabled = true
         }
 
         document.body.style.overflow = 'hidden';
@@ -78,6 +85,7 @@ export class ProductModal {
             this.events.emit('product:put', product)
             this.setDeleteHandler(btn, product);
             btn.textContent = 'Убрать';
+            this.close()
         }
         btn.addEventListener('click', this._productButtonHandler)
     }
@@ -86,8 +94,10 @@ export class ProductModal {
         this.removeHandler(btn)
         this._productButtonHandler = () => {
             this.events.emit('product:delete', product)
-            this.setAddHandler(btn, product); 
+            this.setAddHandler(btn, product);
             btn.textContent = 'В корзину';
+            this.close()
+
         }
         btn.addEventListener('click', this._productButtonHandler)
     }

@@ -2,7 +2,7 @@ import './scss/styles.scss';
 import { API_URL } from './utils/constants'
 import { Api } from './components/base/api'
 import { GlobalStore } from './components/GlobalStore'
-import { IGetProductsResponse, IProduct } from './types';
+import { IContact, IDelivery, IGetProductsResponse, IProduct } from './types';
 import { ViewManager } from './components/ViewManager';
 import { EventEmitter } from './components/base/events';
 import { cloneTemplate, ensureElement } from './utils/utils';
@@ -10,6 +10,8 @@ import { ProductCard } from './components/ProductCard';
 import { ProductModal } from './components/ProductModal';
 import { BasketModal } from './components/BasketModal';
 import { DeliveryModal } from './components/DeliveryModal';
+import { ContactModal } from './components/ContactModal';
+import { ResultModal } from './components/ResultModal';
 
 
 const api = new Api(API_URL)
@@ -19,15 +21,21 @@ const viewManager = new ViewManager('.header', '.gallery', eventEmitter)
 const productModal = new ProductModal(ensureElement('.modal__card'), eventEmitter)
 const basketModal = new BasketModal(ensureElement('.modal__basket'), eventEmitter)
 const deliveryModal = new DeliveryModal(ensureElement('.modal__delivery'), eventEmitter)
+const contactModal = new ContactModal(ensureElement('.modal__contact'), eventEmitter)
+const resultModal = new ResultModal(ensureElement('.modal__result'), eventEmitter)
 
-api.get('/product').then((result: IGetProductsResponse) => {
-    globalStore.setProducts(result.items)
-    result.items.forEach((item: IProduct) => {
-        const clonnedCardTemplate = cloneTemplate('#card-catalog')
-        const productCard = new ProductCard(item.id, item.title, item.description, item.category, item.image, item.price, clonnedCardTemplate, eventEmitter)
-        viewManager.renderProduct(productCard.element)
+api.get('/product')
+    .then((result: IGetProductsResponse) => {
+        globalStore.setProducts(result.items)
+        result.items.forEach((item: IProduct) => {
+            const clonnedCardTemplate = cloneTemplate('#card-catalog')
+            const productCard = new ProductCard(item.id, item.title, item.description, item.category, item.image, item.price, clonnedCardTemplate, eventEmitter)
+            viewManager.renderProduct(productCard.element)
+        })
     })
-})
+    .catch((error) => {
+        console.error('Ошибка получения товаров:', error);
+    });
 
 eventEmitter.on('card:click', (product: IProduct) => {
     console.log('Клик по карточке')
@@ -41,15 +49,14 @@ eventEmitter.on('card:close', () => {
 
 eventEmitter.on('product:put', (product: IProduct) => {
     console.log('Товар в корзине')
-    globalStore.setAddBasketProducts(product)
-    viewManager.displayBasketCounter(globalStore.orderCounte())
+    globalStore.addBasketProducts(product)
+    viewManager.displayBasketCounter(globalStore.orderCount())
 })
 
 eventEmitter.on('product:delete', (product: IProduct) => {
     console.log('Удаление товара')
-    globalStore.setDeleteBasketProducts(product)
-    basketModal.open(globalStore.getBasketProducts(), globalStore.orderAmount())
-    viewManager.displayBasketCounter(globalStore.orderCounte())
+    globalStore.deleteBasketProducts(product)
+    viewManager.displayBasketCounter(globalStore.orderCount())
 })
 
 eventEmitter.on('basket:add', () => {
@@ -62,8 +69,62 @@ eventEmitter.on('basket:close', () => {
     basketModal.close()
 })
 
+eventEmitter.on('basket:delete', (product: IProduct) => {
+    console.log('Удаление товара')
+    globalStore.deleteBasketProducts(product)
+    basketModal.open(globalStore.getBasketProducts(), globalStore.orderAmount())
+    viewManager.displayBasketCounter(globalStore.orderCount())
+})
+
 eventEmitter.on('delivery:open', () => {
     console.log('Переход на оформление')
     deliveryModal.open()
     basketModal.close()
+})
+
+eventEmitter.on('delivery:close', () => {
+    console.log('Закрыте заказа')
+    deliveryModal.close()
+})
+
+eventEmitter.on('delivery:save', (delivery: IDelivery) => {
+    console.log('Сохранение доставки')
+    globalStore.setDelivery(delivery)
+})
+
+eventEmitter.on('contact:open', () => {
+    console.log('Переход на контакты')
+    contactModal.open()
+    deliveryModal.close()
+})
+
+eventEmitter.on('contact:close', () => {
+    console.log('Закрыте контактов')
+    contactModal.close()
+})
+
+eventEmitter.on('contact:save', (contact: IContact) => {
+    console.log('Сохранение контактов')
+    globalStore.setContact(contact)
+})
+
+eventEmitter.on('result:open', () => {
+    console.log('Переход на результат ')
+    resultModal.open(globalStore.orderAmount())
+    contactModal.close()
+})
+
+eventEmitter.on('result:close', () => {
+    console.log('Возвращение к покупкам')
+    api.post('/order', globalStore.getOrder())
+        .then((response) => {
+            globalStore.cleaningBasketProducts()
+            viewManager.displayBasketCounter(globalStore.orderCount())
+            console.log('Успешный заказ:', response);
+        })
+        .catch((error) => {
+            console.error('Ошибка отправки заказа:', error);
+        });
+
+    resultModal.close()
 })

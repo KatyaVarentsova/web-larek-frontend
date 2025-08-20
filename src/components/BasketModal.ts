@@ -34,7 +34,7 @@ export class BasketModal {
 
     addRemoveListeners(btn: HTMLButtonElement, product: IProduct) {
         btn.addEventListener('click', () => {
-            this.events.emit('product:delete', product)
+            this.events.emit('basket:delete', product)
         })
     }
 
@@ -60,7 +60,7 @@ export class BasketModal {
                         createElement<HTMLSpanElement>('span',
                             { className: 'card__title', textContent: product.title }),
                         createElement<HTMLSpanElement>('span',
-                            { className: 'card__price', textContent: product.price ? `${product.price} синапсов` : `Бесценно` }),
+                            { className: 'card__price', textContent: `${product.price} синапсов` }),
                         deleteButton
                     ]
                 )
@@ -84,8 +84,4 @@ export class BasketModal {
     close() {
         this.element.classList.remove('modal_active')
     }
-
-
-
-
 }
