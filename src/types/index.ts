@@ -8,8 +8,13 @@ export interface IProduct {
 }
 
 export interface IGetProductsResponse {
-    total: number;
-    items: IProduct[];
+    total: number,
+    items: IProduct[],
+}
+
+export interface IPostProductsResponse {
+    id: string,
+    total: number
 }
 
 //_soft, _hard, _other, _additional, _button

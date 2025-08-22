@@ -2,7 +2,7 @@ import './scss/styles.scss';
 import { API_URL } from './utils/constants'
 import { Api } from './components/base/api'
 import { GlobalStore } from './components/GlobalStore'
-import { IContact, IDelivery, IGetProductsResponse, IProduct } from './types';
+import { IContact, IDelivery, IGetProductsResponse, IPostProductsResponse, IProduct } from './types';
 import { ViewManager } from './components/ViewManager';
 import { EventEmitter } from './components/base/events';
 import { cloneTemplate, ensureElement } from './utils/utils';
@@ -106,25 +106,25 @@ eventEmitter.on('contact:close', () => {
 eventEmitter.on('contact:save', (contact: IContact) => {
     console.log('Сохранение контактов')
     globalStore.setContact(contact)
+    api.post('/order', globalStore.getOrder())
+        .then((response: IPostProductsResponse) => {
+            globalStore.cleaningBasketProducts()
+            viewManager.displayBasketCounter(globalStore.orderCount())
+            eventEmitter.emit('result:open', response)
+            
+        })
+        .catch((error) => {
+            console.error('Ошибка отправки заказа:', error);
+        });
 })
 
-eventEmitter.on('result:open', () => {
+eventEmitter.on('result:open', (response: IPostProductsResponse) => {
     console.log('Переход на результат ')
-    resultModal.open(globalStore.orderAmount())
+    resultModal.open(response.total)
     contactModal.close()
 })
 
 eventEmitter.on('result:close', () => {
     console.log('Возвращение к покупкам')
-    api.post('/order', globalStore.getOrder())
-        .then((response) => {
-            globalStore.cleaningBasketProducts()
-            viewManager.displayBasketCounter(globalStore.orderCount())
-            console.log('Успешный заказ:', response);
-        })
-        .catch((error) => {
-            console.error('Ошибка отправки заказа:', error);
-        });
-
     resultModal.close()
 })

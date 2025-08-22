@@ -9,6 +9,7 @@ export class BasketModal {
     constructor(clonnedElement: HTMLElement, events: IEvents) {
         this.element = this.createElement(clonnedElement)
         this.events = events;
+        this.addEventListeners()
     }
 
     createElement(clonnedElement: HTMLElement) {
@@ -78,7 +79,6 @@ export class BasketModal {
         }
 
         this.element.classList.add('modal_active')
-        this.addEventListeners()
     }
 
     close() {

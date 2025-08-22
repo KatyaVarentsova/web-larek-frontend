@@ -6,7 +6,7 @@ abstract class Component {
     }
 
     createElement(clonnedTemplate: HTMLElement) { //найти у детей общее
-
+        //возможно оставить пустым 
     }
 
 }

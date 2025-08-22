@@ -8,6 +8,7 @@ export class ResultModal {
     constructor(clonnedElement: HTMLElement, events: IEvents) {
         this.element = this.createElement(clonnedElement)
         this.events = events;
+        this.addEventListeners()
     }
 
     createElement(clonnedElement: HTMLElement) {
@@ -36,7 +37,6 @@ export class ResultModal {
         descriptionElement.textContent = `Списано ${orderAmount} синапсов`
 
         this.element.classList.add('modal_active')
-        this.addEventListeners()
     }
 
     close() {

@@ -33,4 +33,4 @@ export class ViewManager {
         const basketCounter = ensureElement('.header__basket-counter', this.headerNode)
         basketCounter.textContent = String(orderCounte)
     }
-}
+} 

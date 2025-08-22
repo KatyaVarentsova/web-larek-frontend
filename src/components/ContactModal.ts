@@ -15,9 +15,11 @@ export class ContactModal {
         }
         this.element = this.createElement(clonnedElement)
         this.events = events;
+        this.addEventListeners()
     }
 
     createElement(clonnedElement: HTMLElement) {
+
         return clonnedElement
     }
 
@@ -31,6 +33,16 @@ export class ContactModal {
                 this.events.emit('contact:close');
             }
         });
+
+        const formElement = ensureElement<HTMLFormElement>('.form', this.element)
+        formElement.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            this.events.emit('contact:save', this.contact)
+        })
+
+        this.inputEmail()
+        this.inputPhone()
     }
 
     updateButtonState() {
@@ -108,24 +120,13 @@ export class ContactModal {
     }
 
     open() {
-        const formElement = ensureElement<HTMLFormElement>('.form', this.element)
-        formElement.addEventListener('submit', (event) => {
-            event.preventDefault();
-
-            this.events.emit('contact:save', this.contact)
-            this.events.emit('result:open')
-        })
-
         this.buttonContact = ensureElement<HTMLButtonElement>('.button', this.element)
         this.buttonContact.disabled = true;
-
-        this.inputEmail()
-        this.inputPhone()
 
         this.updateButtonState()
 
         this.element.classList.add('modal_active')
-        this.addEventListeners()
+
     }
 
     close() {

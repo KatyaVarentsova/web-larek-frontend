@@ -15,6 +15,7 @@ export class DeliveryModal {
         }
         this.element = this.createElement(clonnedElement)
         this.events = events;
+        this.addEventListeners()
     }
 
     createElement(clonnedElement: HTMLElement) {
@@ -31,6 +32,17 @@ export class DeliveryModal {
                 this.events.emit('delivery:close')
             }
         })
+
+        const formElement = ensureElement<HTMLFormElement>('.form', this.element)
+        formElement.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            this.events.emit('delivery:save', this.delivery);
+            this.events.emit('contact:open')
+        });
+
+        this.selectionButtons()
+        this.inputAddresses()
     }
 
     updateButtonState() {
@@ -92,25 +104,12 @@ export class DeliveryModal {
     }
 
     open() {
-        const formElement = ensureElement<HTMLFormElement>('.form', this.element)
-        formElement.addEventListener('submit', (event) => {
-            event.preventDefault();
-
-            this.events.emit('delivery:save', this.delivery);
-            this.events.emit('contact:open')
-        });
-
-
         this.buttonDelivery = ensureElement<HTMLButtonElement>('.button_further', this.element)
         this.buttonDelivery.disabled = true;
 
-        this.selectionButtons()
-        this.inputAddresses()
-
         this.updateButtonState()
 
-        this.element.classList.add('modal_active')
-        this.addEventListeners()
+        this.element.classList.add('modal_active') 
     }
 
     close() {

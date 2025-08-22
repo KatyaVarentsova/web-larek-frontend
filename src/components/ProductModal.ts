@@ -8,7 +8,7 @@ export class ProductModal {
     events: IEvents;
     private _productButtonHandler?: (event: MouseEvent) => void;
 
-    constructor(clonnedCardTemplate: HTMLElement, events: IEvents) {
+    constructor(clonnedCardTemplate: HTMLElement, events: IEvents) { //поменять clonnedCardTemplate (какой элемент)
         this.element = this.createElement(clonnedCardTemplate)
         this.events = events;
 
