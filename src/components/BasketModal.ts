@@ -1,31 +1,16 @@
 import { IProduct } from "../types";
 import { createElement, ensureElement } from "../utils/utils";
 import { IEvents } from "./base/events";
+import { Modal } from "./base/Modal";
 
-export class BasketModal {
-    element: HTMLElement;
-    events: IEvents;
-
-    constructor(clonnedElement: HTMLElement, events: IEvents) {
-        this.element = this.createElement(clonnedElement)
-        this.events = events;
-        this.addEventListeners()
+export class BasketModal extends Modal {
+    constructor(elementsBlock: HTMLElement, events: IEvents, name: string) {
+        super(events, elementsBlock)
+        this.name = name
     }
 
-    createElement(clonnedElement: HTMLElement) {
-        return clonnedElement
-    }
-
-    addEventListeners() {
-        const buttonClose = ensureElement<HTMLButtonElement>('.modal__close', this.element)
-        buttonClose.addEventListener('click', () => {
-            this.events.emit('basket:close')
-        })
-        this.element.addEventListener('click', (event) => {
-            if (event.target === this.element && event.target !== ensureElement('.modal__container', this.element)) {
-                this.events.emit('basket:close')
-            }
-        })
+    protected addEventListeners() {
+        super.addEventListeners()
 
         const basketButton = ensureElement<HTMLButtonElement>('.button', this.element)
         basketButton.addEventListener('click', () => {
@@ -33,13 +18,13 @@ export class BasketModal {
         })
     }
 
-    addRemoveListeners(btn: HTMLButtonElement, product: IProduct) {
+    private addRemoveListeners(btn: HTMLButtonElement, product: IProduct) {
         btn.addEventListener('click', () => {
             this.events.emit('basket:delete', product)
         })
     }
 
-    open(products: IProduct[], orderAmount: number) {
+    render(products: IProduct[], orderAmount: number) {
         const basketElement = ensureElement<HTMLDivElement>('.basket', this.element)
         const listElement = ensureElement<HTMLUListElement>('.basket__list', basketElement)
         const actionsElement = ensureElement<HTMLDivElement>('.modal__actions', basketElement)
@@ -78,10 +63,6 @@ export class BasketModal {
             listElement.append(emptyElement)
         }
 
-        this.element.classList.add('modal_active')
-    }
-
-    close() {
-        this.element.classList.remove('modal_active')
+        this.open()
     }
 }

@@ -1,45 +1,25 @@
 import { ensureElement } from "../utils/utils";
 import { IEvents } from "./base/events";
+import { Modal } from "./base/Modal";
 
-export class ResultModal {
-    element: HTMLElement;
-    events: IEvents;
-
-    constructor(clonnedElement: HTMLElement, events: IEvents) {
-        this.element = this.createElement(clonnedElement)
-        this.events = events;
-        this.addEventListeners()
+export class ResultModal extends Modal {
+    constructor(elementsBlock: HTMLElement, events: IEvents, name: string) {
+        super(events, elementsBlock)
+        this.name = name
     }
 
-    createElement(clonnedElement: HTMLElement) {
-        return clonnedElement
-    }
-
-    addEventListeners() {
-        const buttonClose = ensureElement<HTMLButtonElement>('.modal__close', this.element);
-        buttonClose.addEventListener('click', () => {
-            this.events.emit('result:close');
-        });
-        this.element.addEventListener('click', (event) => {
-            if (event.target === this.element && event.target !== ensureElement('.modal__container', this.element)) {
-                this.events.emit('result:close');
-            }
-        });
+    protected addEventListeners() {
+        super.addEventListeners()
         const buttonElement = ensureElement<HTMLButtonElement>('.button', this.element);
         buttonElement.addEventListener('click', () => {
             this.events.emit('result:close')
         })
     }
 
-    open(orderAmount: number) {
+    render (orderAmount: number) {
         const descriptionElement = ensureElement<HTMLParagraphElement>('.film__description', this.element)
 
         descriptionElement.textContent = `Списано ${orderAmount} синапсов`
-
-        this.element.classList.add('modal_active')
-    }
-
-    close() {
-        this.element.classList.remove('modal_active')
+        this.open()
     }
 }

@@ -2,36 +2,17 @@ import { categoryMap, IProduct } from "../types";
 import { CDN_URL } from "../utils/constants";
 import { ensureElement } from "../utils/utils";
 import { IEvents } from "./base/events";
+import { Modal } from "./base/Modal";
 
-export class ProductModal {
-    element: HTMLElement;
-    events: IEvents;
+export class ProductModal extends Modal{
     private _productButtonHandler?: (event: MouseEvent) => void;
 
-    constructor(clonnedCardTemplate: HTMLElement, events: IEvents) { //поменять clonnedCardTemplate (какой элемент)
-        this.element = this.createElement(clonnedCardTemplate)
-        this.events = events;
-
-        this.addEventListeners()
+    constructor(elementsBlock: HTMLElement, events: IEvents, name: string) {
+        super(events, elementsBlock)
+        this.name = name
     }
 
-    createElement(clonnedCardTemplate: HTMLElement) {
-        return clonnedCardTemplate
-    }
-
-    addEventListeners() {
-        const buttonClose = ensureElement<HTMLButtonElement>('.modal__close', this.element)
-        buttonClose.addEventListener('click', () => {
-            this.events.emit('card:close')
-        })
-        this.element.addEventListener('click', (event) => {
-            if (event.target === this.element && event.target !== ensureElement('.modal__container', this.element)) {
-                this.events.emit('card:close')
-            }
-        })
-    }
-
-    open(product: IProduct, isProductInBasket: boolean) {
+    render(product: IProduct, isProductInBasket: boolean) {
         const productImage = ensureElement<HTMLImageElement>('.card__image', this.element)
         const productCategory = ensureElement<HTMLSpanElement>('.card__category', this.element)
         const productTitle = ensureElement<HTMLHeadingElement>('.card__title', this.element)
@@ -64,13 +45,7 @@ export class ProductModal {
             productButton.disabled = true
         }
 
-        document.body.style.overflow = 'hidden';
-        this.element.classList.add('modal_active')
-    }
-
-    close() {
-        document.body.style.overflow = '';
-        this.element.classList.remove('modal_active')
+        this.open()
     }
 
     private removeHandler(btn: HTMLButtonElement) {

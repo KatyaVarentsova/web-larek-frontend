@@ -1,12 +1,23 @@
-abstract class Component {
+import { IEvents } from "./events";
+
+export abstract class Component {
     protected element: HTMLElement;
+    protected events: IEvents;
 
-    constructor(element: HTMLElement) {
-        this.element = element
+    constructor(events: IEvents, elementsBlock: HTMLElement) {
+        this.events = events
+
+        this.element = this.createElement(elementsBlock)
+        this.addEventListeners()
     }
 
-    createElement(clonnedTemplate: HTMLElement) { //найти у детей общее
-        //возможно оставить пустым 
+    protected createElement(elementsBlock: HTMLElement): HTMLElement { 
+        return elementsBlock
     }
 
+    protected addEventListeners(): void {}
+
+    getElement() {
+        return this.element
+    }
 }

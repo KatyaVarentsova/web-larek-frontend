@@ -1,18 +1,19 @@
 import { categoryMap } from "../types";
 import { CDN_URL } from "../utils/constants";
 import { ensureElement } from "../utils/utils";
+import { Component } from "./base/Component";
 import { IEvents } from "./base/events";
 
-export class ProductCard {
+export class ProductCard extends Component {
     id: string;
     title: string;
     description: string;
     category: string;
     image: string;
     price: number;
-    element: HTMLElement;
 
-    constructor(id: string, title: string, description: string, category: string, image: string, price: number, clonnedCardTemplate: HTMLElement, events: IEvents) {
+    constructor(events: IEvents, elementsBlock: HTMLElement, id: string, title: string, description: string, category: string, image: string, price: number) {
+        super(events, elementsBlock)
         this.id = id;
         this.title = title;
         this.description = description;
@@ -20,15 +21,14 @@ export class ProductCard {
         this.image = image;
         this.price = price;
 
-        this.element = this.createElement(clonnedCardTemplate)
-        this.addEventListeners(events)
+        this.render()
     }
 
-    createElement(clonnedCardTemplate: HTMLElement) {
-        const cardCategory = ensureElement<HTMLSpanElement>('.card__category', clonnedCardTemplate)
-        const cardTitle = ensureElement<HTMLHeadingElement>('.card__title', clonnedCardTemplate)
-        const cardImage = ensureElement<HTMLImageElement>('.card__image', clonnedCardTemplate)
-        const cardPrice = ensureElement<HTMLSpanElement>('.card__price', clonnedCardTemplate)
+    private render(): void {
+        const cardCategory = ensureElement<HTMLSpanElement>('.card__category', this.element)
+        const cardTitle = ensureElement<HTMLHeadingElement>('.card__title', this.element)
+        const cardImage = ensureElement<HTMLImageElement>('.card__image', this.element)
+        const cardPrice = ensureElement<HTMLSpanElement>('.card__price', this.element)
 
         cardCategory.textContent = this.category
         const categoryClass = categoryMap[this.category.toLocaleLowerCase()]
@@ -40,13 +40,11 @@ export class ProductCard {
         cardImage.src = CDN_URL + this.image
         
         cardPrice.textContent = this.price ? `${this.price} синапсов` : `Бесценно`
-
-        return clonnedCardTemplate
     }
 
-    addEventListeners(events: IEvents) {
+    protected addEventListeners() {
         this.element.addEventListener('click', () => {
-            events.emit('card:click', this)
+            this.events.emit('card:click', this)
         })
     }
 }

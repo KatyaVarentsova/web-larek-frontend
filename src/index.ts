@@ -18,19 +18,19 @@ const api = new Api(API_URL)
 const globalStore = new GlobalStore()
 const eventEmitter = new EventEmitter()
 const viewManager = new ViewManager('.header', '.gallery', eventEmitter)
-const productModal = new ProductModal(ensureElement('.modal__card'), eventEmitter)
-const basketModal = new BasketModal(ensureElement('.modal__basket'), eventEmitter)
-const deliveryModal = new DeliveryModal(ensureElement('.modal__delivery'), eventEmitter)
-const contactModal = new ContactModal(ensureElement('.modal__contact'), eventEmitter)
-const resultModal = new ResultModal(ensureElement('.modal__result'), eventEmitter)
+const productModal = new ProductModal(ensureElement('.modal__card'), eventEmitter, 'card')
+const basketModal = new BasketModal(ensureElement('.modal__basket'), eventEmitter, 'basket')
+const deliveryModal = new DeliveryModal(ensureElement('.modal__delivery'), eventEmitter, 'delivery')
+const contactModal = new ContactModal(ensureElement('.modal__contact'), eventEmitter, 'contact')
+const resultModal = new ResultModal(ensureElement('.modal__result'), eventEmitter, 'result')
 
 api.get('/product')
     .then((result: IGetProductsResponse) => {
         globalStore.setProducts(result.items)
         result.items.forEach((item: IProduct) => {
-            const clonnedCardTemplate = cloneTemplate('#card-catalog')
-            const productCard = new ProductCard(item.id, item.title, item.description, item.category, item.image, item.price, clonnedCardTemplate, eventEmitter)
-            viewManager.renderProduct(productCard.element)
+            const cardTemplate = cloneTemplate('#card-catalog')
+            const productCard = new ProductCard(eventEmitter, cardTemplate, item.id, item.title, item.description, item.category, item.image, item.price )
+            viewManager.renderProduct(productCard.getElement())
         })
     })
     .catch((error) => {
@@ -39,7 +39,7 @@ api.get('/product')
 
 eventEmitter.on('card:click', (product: IProduct) => {
     console.log('Клик по карточке')
-    productModal.open(product, globalStore.isProductInBasket(product))
+    productModal.render(product, globalStore.isProductInBasket(product))
 })
 
 eventEmitter.on('card:close', () => {
@@ -61,7 +61,7 @@ eventEmitter.on('product:delete', (product: IProduct) => {
 
 eventEmitter.on('basket:add', () => {
     console.log('Клик по корзине')
-    basketModal.open(globalStore.getBasketProducts(), globalStore.orderAmount())
+    basketModal.render(globalStore.getBasketProducts(), globalStore.orderAmount())
 })
 
 eventEmitter.on('basket:close', () => {
@@ -72,13 +72,13 @@ eventEmitter.on('basket:close', () => {
 eventEmitter.on('basket:delete', (product: IProduct) => {
     console.log('Удаление товара')
     globalStore.deleteBasketProducts(product)
-    basketModal.open(globalStore.getBasketProducts(), globalStore.orderAmount())
+    basketModal.render(globalStore.getBasketProducts(), globalStore.orderAmount())
     viewManager.displayBasketCounter(globalStore.orderCount())
 })
 
 eventEmitter.on('delivery:open', () => {
     console.log('Переход на оформление')
-    deliveryModal.open()
+    deliveryModal.render()
     basketModal.close()
 })
 
@@ -94,7 +94,7 @@ eventEmitter.on('delivery:save', (delivery: IDelivery) => {
 
 eventEmitter.on('contact:open', () => {
     console.log('Переход на контакты')
-    contactModal.open()
+    contactModal.render()
     deliveryModal.close()
 })
 
@@ -120,7 +120,7 @@ eventEmitter.on('contact:save', (contact: IContact) => {
 
 eventEmitter.on('result:open', (response: IPostProductsResponse) => {
     console.log('Переход на результат ')
-    resultModal.open(response.total)
+    resultModal.render(response.total)
     contactModal.close()
 })
 

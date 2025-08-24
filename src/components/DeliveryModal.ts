@@ -1,38 +1,23 @@
 import { IDelivery } from "../types";
 import { ensureAllElements, ensureElement } from "../utils/utils";
 import { IEvents } from "./base/events";
+import { Modal } from "./base/Modal";
 
-export class DeliveryModal {
-    delivery: IDelivery;
-    element: HTMLElement;
-    events: IEvents;
-    buttonDelivery!: HTMLButtonElement;
+export class DeliveryModal extends Modal {
+    private delivery: IDelivery;
+    private buttonDelivery!: HTMLButtonElement;
 
-    constructor(clonnedElement: HTMLElement, events: IEvents) {
+    constructor(elementsBlock: HTMLElement, events: IEvents, name: string) {
+        super(events, elementsBlock)
+        this.name = name
         this.delivery = {
             payment: '',
             address: '',
         }
-        this.element = this.createElement(clonnedElement)
-        this.events = events;
-        this.addEventListeners()
     }
 
-    createElement(clonnedElement: HTMLElement) {
-        return clonnedElement
-    }
-
-    addEventListeners() {
-        const buttonClose = ensureElement<HTMLButtonElement>('.modal__close', this.element)
-        buttonClose.addEventListener('click', () => {
-            this.events.emit('delivery:close')
-        })
-        this.element.addEventListener('click', (event) => {
-            if (event.target === this.element && event.target !== ensureElement('.modal__container', this.element)) {
-                this.events.emit('delivery:close')
-            }
-        })
-
+    protected addEventListeners() {
+        super.addEventListeners()
         const formElement = ensureElement<HTMLFormElement>('.form', this.element)
         formElement.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -45,11 +30,11 @@ export class DeliveryModal {
         this.inputAddresses()
     }
 
-    updateButtonState() {
+    private updateButtonState() {
         this.buttonDelivery.disabled = !(this.delivery.address && this.delivery.payment);
     }
 
-    selectionButtons() {
+    private selectionButtons() {
         const errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element);
         const buttonOnline = ensureElement<HTMLButtonElement>('.button_online', this.element)
         const buttonCash = ensureElement<HTMLButtonElement>('.button_cash', this.element)
@@ -71,7 +56,7 @@ export class DeliveryModal {
         })
     }
 
-    isValidRussianString(str: string, input: HTMLInputElement) {
+    private isValidRussianString(str: string, input: HTMLInputElement) {
         const errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element);
 
         if (/^[а-яА-ЯёЁ0-9\s.,-]+$/.test(str)) {
@@ -86,7 +71,7 @@ export class DeliveryModal {
         }
     }
 
-    inputAddresses() {
+    private inputAddresses() {
         const input = ensureElement<HTMLInputElement>('.form__input', this.element)
         const errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element);
 
@@ -103,16 +88,12 @@ export class DeliveryModal {
         })
     }
 
-    open() {
+    render() {
         this.buttonDelivery = ensureElement<HTMLButtonElement>('.button_further', this.element)
         this.buttonDelivery.disabled = true;
 
         this.updateButtonState()
 
-        this.element.classList.add('modal_active') 
-    }
-
-    close() {
-        this.element.classList.remove('modal_active')
+        this.open()
     }
 }

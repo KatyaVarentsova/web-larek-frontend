@@ -1,38 +1,23 @@
 import { IContact } from "../types";
 import { ensureElement } from "../utils/utils";
 import { IEvents } from "./base/events";
+import { Modal } from "./base/Modal";
 
-export class ContactModal {
-    contact: IContact;
-    element: HTMLElement;
-    events: IEvents;
-    buttonContact!: HTMLButtonElement;
+export class ContactModal extends Modal {
+    private contact: IContact;
+    private buttonContact!: HTMLButtonElement;
 
-    constructor(clonnedElement: HTMLElement, events: IEvents) {
+    constructor(elementsBlock: HTMLElement, events: IEvents, name: string) {
+        super(events, elementsBlock)
+        this.name = name
         this.contact = {
             email: '',
             phone: '',
         }
-        this.element = this.createElement(clonnedElement)
-        this.events = events;
-        this.addEventListeners()
     }
 
-    createElement(clonnedElement: HTMLElement) {
-
-        return clonnedElement
-    }
-
-    addEventListeners() {
-        const buttonClose = ensureElement<HTMLButtonElement>('.modal__close', this.element);
-        buttonClose.addEventListener('click', () => {
-            this.events.emit('contact:close');
-        });
-        this.element.addEventListener('click', (event) => {
-            if (event.target === this.element && event.target !== ensureElement('.modal__container', this.element)) {
-                this.events.emit('contact:close');
-            }
-        });
+    protected addEventListeners() {
+        super.addEventListeners()
 
         const formElement = ensureElement<HTMLFormElement>('.form', this.element)
         formElement.addEventListener('submit', (event) => {
@@ -45,11 +30,11 @@ export class ContactModal {
         this.inputPhone()
     }
 
-    updateButtonState() {
+    private updateButtonState() {
         this.buttonContact.disabled = !(this.contact.email && this.contact.phone);
     }
 
-    isValidateEmail(email: string, input: HTMLInputElement) {
+    private isValidateEmail(email: string, input: HTMLInputElement) {
         const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         const errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element)
 
@@ -65,7 +50,7 @@ export class ContactModal {
         }
     }
 
-    inputEmail() {
+    private inputEmail() {
         const input = ensureElement<HTMLInputElement>('.input__email', this.element)
 
         input.addEventListener('blur', () => {
@@ -80,7 +65,7 @@ export class ContactModal {
         })
     }
 
-    inputPhone() {
+    private inputPhone() {
         const input = ensureElement<HTMLInputElement>('.input__phone', this.element)
         const errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element);
 
@@ -119,17 +104,12 @@ export class ContactModal {
         })
     }
 
-    open() {
+    render() {
         this.buttonContact = ensureElement<HTMLButtonElement>('.button', this.element)
         this.buttonContact.disabled = true;
 
         this.updateButtonState()
 
-        this.element.classList.add('modal_active')
-
-    }
-
-    close() {
-        this.element.classList.remove('modal_active')
+        this.open()
     }
 }
