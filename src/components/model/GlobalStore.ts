@@ -1,8 +1,7 @@
 /* Класс, описывающий состояние приложения*/
+import { IContact, IDelivery, IGlobalStore, IOrder, IOrderRequestBody, IProduct } from "../../types";
 
-import { IContact, IDelivery, IOrder, IProduct } from "../types";
-
-export class GlobalStore {
+export class GlobalStore implements IGlobalStore {
     private products: IProduct[];
     private basketProducts: IProduct[];
     private delivery: IDelivery;
@@ -14,33 +13,33 @@ export class GlobalStore {
         this.basketProducts = [];
     }
 
-    setProducts(products: IProduct[]) {
+    setProducts(products: IProduct[]):void {
         this.products = products
     }
 
-    getBasketProducts() {
+    getBasketProducts():IProduct[] {
         return this.basketProducts
     }
 
-    addBasketProducts(product: IProduct) { 
+    addBasketProducts(product: IProduct):void { 
         this.basketProducts.push(product)
     }
 
-    deleteBasketProducts(product: IProduct) { 
+    deleteBasketProducts(product: IProduct):void { 
         this.basketProducts = this.basketProducts.filter(item => {
             return item !== product
         })
     }
 
-    cleaningBasketProducts() {
+    cleaningBasketProducts():void {
         this.basketProducts.length = 0;
     }
 
-    isProductInBasket(product: IProduct) {
+    isProductInBasket(product: IProduct):boolean {
         return this.basketProducts.includes(product);
     }
 
-    orderAmount() {
+    orderAmount():number {
         let amount = 0
         this.basketProducts.forEach(item => {
             if (item.price) {
@@ -50,11 +49,11 @@ export class GlobalStore {
         return amount
     }
 
-    orderCount() {
+    orderCount():number {
         return this.basketProducts.length
     }
 
-    allProductsID() {
+    allProductsID(): string[] {
         const arrID: string[] = []
         this.basketProducts.forEach((item) => {
             arrID.push(item.id)
@@ -62,23 +61,23 @@ export class GlobalStore {
         return arrID
     }
 
-    setDelivery(delivery: IDelivery) {
+    setDelivery(delivery: IDelivery):void {
         this.delivery = delivery;
     }
 
-    getDelivery() {
+    getDelivery():IDelivery {
         return this.delivery
     }
 
-    setContact(contact: IContact) {
+    setContact(contact: IContact):void {
         this.contact = contact
     }
 
-    getContact() {
+    getContact():IContact {
         return this.contact
     }
 
-    getOrder() {
+    getOrder(): IOrderRequestBody { 
         return this.order = {
             payment: this.delivery.payment,
             email: this.contact.email,

@@ -34,7 +34,7 @@ export class BasketModal extends Modal {
         listElement.innerHTML = ''
 
         if (products.length !== 0) {
-            products.forEach((product, index) => {
+            products.forEach((product, index) => { 
                 const deleteButton = createElement<HTMLButtonElement>('button',
                     { className: 'basket__item-delete', ariaLabel: 'удалить' })
 

@@ -1,9 +1,9 @@
 import './scss/styles.scss';
 import { API_URL } from './utils/constants'
 import { Api } from './components/base/api'
-import { GlobalStore } from './components/GlobalStore'
-import { IContact, IDelivery, IGetProductsResponse, IPostProductsResponse, IProduct } from './types';
-import { ViewManager } from './components/ViewManager';
+import { GlobalStore } from './components/model/GlobalStore';
+import { IContact, IDelivery, IGetProductsResponse, IPostOrderResponse, IProduct } from './types';
+import { ViewManager } from './components/view/ViewManager';
 import { EventEmitter } from './components/base/events';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { ProductCard } from './components/ProductCard';
@@ -12,7 +12,6 @@ import { BasketModal } from './components/BasketModal';
 import { DeliveryModal } from './components/DeliveryModal';
 import { ContactModal } from './components/ContactModal';
 import { ResultModal } from './components/ResultModal';
-
 
 const api = new Api(API_URL)
 const globalStore = new GlobalStore()
@@ -59,7 +58,7 @@ eventEmitter.on('product:delete', (product: IProduct) => {
     viewManager.displayBasketCounter(globalStore.orderCount())
 })
 
-eventEmitter.on('basket:add', () => {
+eventEmitter.on('basket:open', () => {
     console.log('Клик по корзине')
     basketModal.render(globalStore.getBasketProducts(), globalStore.orderAmount())
 })
@@ -106,8 +105,8 @@ eventEmitter.on('contact:close', () => {
 eventEmitter.on('contact:save', (contact: IContact) => {
     console.log('Сохранение контактов')
     globalStore.setContact(contact)
-    api.post('/order', globalStore.getOrder())
-        .then((response: IPostProductsResponse) => {
+    api.post('/order', globalStore.getOrder()) 
+        .then((response: IPostOrderResponse) => {
             globalStore.cleaningBasketProducts()
             viewManager.displayBasketCounter(globalStore.orderCount())
             eventEmitter.emit('result:open', response)
@@ -118,7 +117,7 @@ eventEmitter.on('contact:save', (contact: IContact) => {
         });
 })
 
-eventEmitter.on('result:open', (response: IPostProductsResponse) => {
+eventEmitter.on('result:open', (response: IPostOrderResponse) => {
     console.log('Переход на результат ')
     resultModal.render(response.total)
     contactModal.close()

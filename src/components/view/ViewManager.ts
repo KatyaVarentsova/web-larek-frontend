@@ -1,13 +1,12 @@
-import { categoryMap, IProduct } from "../types";
-import { CDN_URL } from "../utils/constants";
-import { cloneTemplate, ensureElement } from "../utils/utils";
-import { IEvents } from "./base/events";
-import { ProductCard } from "./ProductCard";
+import { IViewManager } from "../../types";
+import { ensureElement } from "../../utils/utils";
+import { IEvents } from "../base/events";
 
-export class ViewManager {
-    headerNode: HTMLElement;
-    galleryNode: HTMLElement;
-    events: IEvents;
+
+export class ViewManager implements IViewManager {
+    private headerNode: HTMLElement;
+    private galleryNode: HTMLElement;
+    private events: IEvents;
 
     constructor(headerSelector: string, gallerySelector: string, events: IEvents) {
         this.headerNode = ensureElement(headerSelector)
@@ -25,7 +24,7 @@ export class ViewManager {
         const basket = ensureElement('.header__basket', this.headerNode)
 
         basket.addEventListener('click', () => {
-            this.events.emit('basket:add')
+            this.events.emit('basket:open')
         })
     }
 

@@ -5,7 +5,7 @@ import { IEvents } from "./base/events";
 import { Modal } from "./base/Modal";
 
 export class ProductModal extends Modal{
-    private _productButtonHandler?: (event: MouseEvent) => void;
+    private productButtonHandler?: (event: MouseEvent) => void; //убрать _
 
     constructor(elementsBlock: HTMLElement, events: IEvents, name: string) {
         super(events, elementsBlock)
@@ -49,31 +49,31 @@ export class ProductModal extends Modal{
     }
 
     private removeHandler(btn: HTMLButtonElement) {
-        if (this._productButtonHandler) {
-            btn.removeEventListener('click', this._productButtonHandler);
+        if (this.productButtonHandler) {
+            btn.removeEventListener('click', this.productButtonHandler);
         }
     }
 
     private setAddHandler(btn: HTMLButtonElement, product: IProduct) {
         this.removeHandler(btn)
-        this._productButtonHandler = () => {
+        this.productButtonHandler = () => {
             this.events.emit('product:put', product)
             this.setDeleteHandler(btn, product);
             btn.textContent = 'Убрать';
             this.close()
         }
-        btn.addEventListener('click', this._productButtonHandler)
+        btn.addEventListener('click', this.productButtonHandler)
     }
 
     private setDeleteHandler(btn: HTMLButtonElement, product: IProduct) {
         this.removeHandler(btn)
-        this._productButtonHandler = () => {
+        this.productButtonHandler = () => {
             this.events.emit('product:delete', product)
             this.setAddHandler(btn, product);
             btn.textContent = 'В корзину';
             this.close()
 
         }
-        btn.addEventListener('click', this._productButtonHandler)
+        btn.addEventListener('click', this.productButtonHandler)
     }
 }
