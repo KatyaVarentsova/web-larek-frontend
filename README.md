@@ -77,7 +77,7 @@ interface IGlobalStore {
 ```
 
 #### Типы 
-Контракты для классов.
+Контракты для описания продуктов, корзины, доставки, контакта и заказа.
 ```TypeScript
 interface IProduct {
     id: string,
