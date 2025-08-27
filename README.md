@@ -241,7 +241,8 @@ interface IOrderRequestBody {
 **Свойства**
 - formElement: HTMLFormElement — сама форма внутри модалки.
 - buttonForm: HTMLButtonElement — кнопка продолжения/отправки формы (инициализируется при рендере).
-- 
+- errorElement: HTMLSpanElement — комментарий с ошибкой.
+
 **Методы**
 - constructor(elementsBlock, events) — вызывает конструктор Modal, инициализирует базовую структуру формы.
 - eventsEmit() — абстрактный метод-заглушка, который должны переопределять наследники (определяет, какие события генерируются при отправке формы).
