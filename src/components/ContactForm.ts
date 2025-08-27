@@ -32,15 +32,14 @@ export class ContactForm extends Form {
 
     private isValidateEmail(email: string, input: HTMLInputElement) {
         const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element)
 
         if (regex.test(String(email).toLowerCase())) {
-            errorElement.style.display = 'none'
+            this.errorElement.style.display = 'none'
             input.classList.remove('form__input__invalid')
             return true
         } else {
-            errorElement.style.display = 'block'
-            errorElement.textContent = 'Неправильный адрес электронной почты'
+            this.errorElement.style.display = 'block'
+            this.errorElement.textContent = 'Неправильный адрес электронной почты'
             input.classList.add('form__input__invalid')
             return false
         }
@@ -55,18 +54,16 @@ export class ContactForm extends Form {
         })
 
         input.addEventListener('input', () => {
-            const errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element);
-            errorElement.style.display = 'none';
+            this.errorElement.style.display = 'none';
             input.classList.remove('form__input__invalid');
         })
     }
 
     private inputPhone() {
         const input = ensureElement<HTMLInputElement>('.input__phone', this.element)
-        const errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element);
 
         input.addEventListener('input', () => {
-            errorElement.style.display = 'none';
+            this.errorElement.style.display = 'none';
             input.classList.remove('form__input__invalid');
 
             let value = input.value.replace(/\D/g, '');
@@ -93,8 +90,8 @@ export class ContactForm extends Form {
 
         input.addEventListener('blur', () => {
             if (input.value.length !== 18) {
-                errorElement.style.display = 'block'
-                errorElement.textContent = 'Неправильный номер телефона'
+                this.errorElement.style.display = 'block'
+                this.errorElement.textContent = 'Неправильный номер телефона'
                 input.classList.add('form__input__invalid')
             }
         })

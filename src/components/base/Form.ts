@@ -5,6 +5,7 @@ import { Modal } from "./Modal";
 export abstract class Form extends Modal {
     protected formElement: HTMLFormElement;
     protected buttonForm!: HTMLButtonElement;
+    protected errorElement: HTMLSpanElement;
 
     constructor(elementsBlock: HTMLElement, events: IEvents) {
         super(events, elementsBlock)
@@ -26,6 +27,9 @@ export abstract class Form extends Modal {
     render() {
         this.buttonForm = ensureElement<HTMLButtonElement>('.button_further', this.element)
         this.buttonForm.disabled = true;
+
+        this.errorElement = ensureElement<HTMLSpanElement>('.form__errors', this.element);
+        this.errorElement.style.display = 'none';
 
         this.open()
     }
