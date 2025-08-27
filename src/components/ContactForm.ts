@@ -1,14 +1,13 @@
 import { IContact } from "../types";
 import { ensureElement } from "../utils/utils";
 import { IEvents } from "./base/events";
-import { Modal } from "./base/Modal";
+import { Form } from "./base/Form";
 
-export class ContactModal extends Modal {
+export class ContactForm extends Form {
     private contact: IContact;
-    private buttonContact!: HTMLButtonElement;
 
     constructor(elementsBlock: HTMLElement, events: IEvents, name: string) {
-        super(events, elementsBlock)
+        super(elementsBlock, events)
         this.name = name
         this.contact = {
             email: '',
@@ -16,22 +15,19 @@ export class ContactModal extends Modal {
         }
     }
 
+    protected eventsEmit() {
+        this.events.emit('contact:save', this.contact)
+    }
+
     protected addEventListeners() {
         super.addEventListeners()
-
-        const formElement = ensureElement<HTMLFormElement>('.form', this.element)
-        formElement.addEventListener('submit', (event) => {
-            event.preventDefault();
-
-            this.events.emit('contact:save', this.contact)
-        })
 
         this.inputEmail()
         this.inputPhone()
     }
 
     private updateButtonState() {
-        this.buttonContact.disabled = !(this.contact.email && this.contact.phone);
+        this.buttonForm.disabled = !(this.contact.email && this.contact.phone);
     }
 
     private isValidateEmail(email: string, input: HTMLInputElement) {
@@ -105,11 +101,7 @@ export class ContactModal extends Modal {
     }
 
     render() {
-        this.buttonContact = ensureElement<HTMLButtonElement>('.button', this.element)
-        this.buttonContact.disabled = true;
-
+        super.render()
         this.updateButtonState()
-
-        this.open()
     }
 }

@@ -1,14 +1,13 @@
 import { IDelivery } from "../types";
 import { ensureAllElements, ensureElement } from "../utils/utils";
 import { IEvents } from "./base/events";
-import { Modal } from "./base/Modal";
+import { Form } from "./base/Form";
 
-export class DeliveryModal extends Modal {
+export class DeliveryForm extends Form {
     private delivery: IDelivery;
-    private buttonDelivery!: HTMLButtonElement;
 
     constructor(elementsBlock: HTMLElement, events: IEvents, name: string) {
-        super(events, elementsBlock)
+        super(elementsBlock, events)
         this.name = name
         this.delivery = {
             payment: '',
@@ -16,22 +15,20 @@ export class DeliveryModal extends Modal {
         }
     }
 
+    protected eventsEmit() {
+        this.events.emit('delivery:save', this.delivery);
+        this.events.emit('contact:open')
+    }
+
     protected addEventListeners() {
         super.addEventListeners()
-        const formElement = ensureElement<HTMLFormElement>('.form', this.element)
-        formElement.addEventListener('submit', (event) => {
-            event.preventDefault();
-
-            this.events.emit('delivery:save', this.delivery);
-            this.events.emit('contact:open')
-        });
 
         this.selectionButtons()
         this.inputAddresses()
     }
 
     private updateButtonState() {
-        this.buttonDelivery.disabled = !(this.delivery.address && this.delivery.payment);
+        this.buttonForm.disabled = !(this.delivery.address && this.delivery.payment);
     }
 
     private selectionButtons() {
@@ -89,11 +86,7 @@ export class DeliveryModal extends Modal {
     }
 
     render() {
-        this.buttonDelivery = ensureElement<HTMLButtonElement>('.button_further', this.element)
-        this.buttonDelivery.disabled = true;
-
+        super.render()
         this.updateButtonState()
-
-        this.open()
     }
 }
